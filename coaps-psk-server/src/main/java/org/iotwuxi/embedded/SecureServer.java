@@ -62,6 +62,7 @@ public class SecureServer
         server.add(new CoapResource("secure") {
             @Override
             public void handleGET(CoapExchange exchange) {
+
                 exchange.respond(ResponseCode.CONTENT, "Hello Security!");
             }
         });

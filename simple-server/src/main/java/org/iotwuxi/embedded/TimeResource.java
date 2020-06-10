@@ -2,6 +2,8 @@ package org.iotwuxi.embedded;
 
 import org.eclipse.californium.core.CoapResource;
 import org.eclipse.californium.core.coap.CoAP;
+import org.eclipse.californium.core.observe.ObserveRelation;
+import org.eclipse.californium.core.observe.ObserveRelationFilter;
 import org.eclipse.californium.core.server.resources.CoapExchange;
 
 import java.text.SimpleDateFormat;
@@ -20,7 +22,13 @@ public class TimeResource extends CoapResource {
         ScheduledExecutorService service = new ScheduledThreadPoolExecutor(1);
         service.scheduleAtFixedRate(new Runnable() {
             public void run() {
-                changed();
+                changed(new ObserveRelationFilter() {
+                    @Override
+                    public boolean accept(ObserveRelation relation) {
+                       System.out.println("token:"+relation.getExchange().getRequest().getToken().toString());
+                        return true;
+                    }
+                });
             }
         }, 0, 5, TimeUnit.SECONDS);
     }
@@ -29,8 +37,11 @@ public class TimeResource extends CoapResource {
     public void handleGET(CoapExchange exchange) {
         exchange.setMaxAge(10);
         Date date = new Date();
+
         exchange.respond(CoAP.ResponseCode.CONTENT,
                 new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date));
+      //  ObserveRelation observeRelation=   exchange.advanced().getRelation();
+        //observeRelation.notifyObservers();
     }
 
     @Override

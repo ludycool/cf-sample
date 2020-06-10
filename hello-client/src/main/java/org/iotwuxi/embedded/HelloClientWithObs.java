@@ -1,6 +1,7 @@
 package org.iotwuxi.embedded;
 
 import org.eclipse.californium.core.*;
+import org.eclipse.californium.core.coap.Request;
 import org.eclipse.californium.core.network.CoapEndpoint;
 import org.eclipse.californium.core.network.config.NetworkConfig;
 import org.eclipse.californium.elements.exception.ConnectorException;
@@ -34,11 +35,13 @@ public class HelloClientWithObs {
         NetworkConfig networkConfig = NetworkConfig.createStandardWithoutFile();
         CoapEndpoint.Builder coapEndpointBuilder = new CoapEndpoint.Builder();
         coapEndpointBuilder.setNetworkConfig(networkConfig);
-
         CoapClient client = new CoapClient();
         client.setEndpoint(coapEndpointBuilder.build());
         client.setURI(uri.toString());
-        CoapObserveRelation relation = client.observe(new ObserveTimeHandler());
+        Request request=Request.newGet();
+        request.setToken(new byte[]{0x01,0x02,0x03});
+        request.setObserve();
+        CoapObserveRelation relation = client.observe(request,new ObserveTimeHandler());
 
         Thread.sleep(60*1000);
 
